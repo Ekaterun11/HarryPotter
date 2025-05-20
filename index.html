@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+ <div id="app">
+        <div class="header">
+            <h1>Harry Potter Characters</h1>
+            <div class="user-info">
+                <span v-if="currentUser">{{ currentUser.fullName }}</span>
+                <div v-if="currentUser" class="favorites-info">
+                    Избранное:<br>
+                    волшебники - {{ wizardFavoritesCount }}; не волшебники - {{ nonWizardFavoritesCount }}
+                </div>
+                <div class="auth-buttons" v-if="!currentUser">
+                    <button class="auth-btn login-btn" @click="showLoginModal = true">Вход</button>
+                    <button class="auth-btn register-btn" @click="showRegisterModal = true">Регистрация</button>
+                </div>
+                <button class="auth-btn logout-btn" @click="logout" v-if="currentUser">Выйти</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="search">Поиск по (имени, факультету, актеру):</label>
+                <input type="text" id="search" v-model="searchQuery" placeholder="Поиск...">
+            </div>
+            <div class="control-group">
+                <label for="sort">Сортировать по:</label>
+                <select id="sort" v-model="sortBy">
+                    <option value="">Не выбрано</option>
+                    <option value="name-asc">Имя (A-Z)</option>
+                    <option value="name-desc">Имя (Z-A)</option>
+                    <option value="house-asc">Факультет (A-Z)</option>
+                    <option value="house-desc">Факультет (Z-A)</option>
+                    <option value="year-asc">Возраст (asc)</option>
+                    <option value="year-desc">Возраст (desc)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="gender-filter">Фильтрация по гендеру:</label>
+                <select id="gender-filter" v-model="genderFilter">
+                    <option value="">Все</option>
+                    <option value="male">Мужчина</option>
+                    <option value="female">Девушка</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="alive-filter">Фильтровать по статусу жизни:</label>
+                <select id="alive-filter" v-model="aliveFilter">
+                    <option value="">Все</option>
+                    <option value="alive">Живой</option>
+                    <option value="dead">Умерший</option>
+                </select>
+            </div>
+            <button class="reset-btn" @click="resetFilters">Очистить фильтры</button>
+        </div>
+
+        <div class="characters-grid">
+            <div class="character-card" v-for="character in filteredCharacters" :key="character.id" @click="openCharacterModal(character)">
+                <img class="character-image" :src="character.image || 'https://via.placeholder.com/280x200?text=No+Image'" :alt="character.name">
+                <div class="character-info">
+                    <h3 class="character-name">{{ character.name }}</h3>
+                    <p class="character-detail"><span>Факультет:</span> 
+                        <span v-if="character.house" :class="getHouseClass(character.house)">{{ character.house }}</span>
+                        <span v-else>Unknown</span>
+                    </p>
+                    <p class="character-detail"><span>Актер:</span> {{ character.actor }}</p>
+                    <p class="character-detail"><span>Существо:</span> {{ character.species }}</p>
+                    <p class="character-detail"><span>Гендер:</span> {{ character.gender }}</p>
+                    <p class="character-detail"><span>Волшебник?:</span> {{ character.wizard ? 'Yes' : 'No' }}</p>
+                    <p class="character-detail"><span>Год рождения:</span> {{ character.yearOfBirth || 'Unknown' }}</p>
+                    
+                    <button 
+                        class="favorite-btn" 
+                        :class="isFavorite(character.id) ? 'remove-favorite' : 'add-favorite'"
+                        v-if="currentUser"
+                        @click.stop="toggleFavorite(character)"
+                    >
+                        {{ isFavorite(character.id) ? 'Remove from favorites' : 'Add to favorites' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal" v-if="selectedCharacter" @click.self="closeCharacterModal">
+            <div class="modal-content">
+                <button class="close-btn" @click="closeCharacterModal">&times;</button>
+                <img class="modal-image" :src="selectedCharacter.image || 'https://via.placeholder.com/150?text=No+Image'" :alt="selectedCharacter.name">
+                <h2 class="modal-title">{{ selectedCharacter.name }}</h2>
+                
+                <div v-for="(value, key) in selectedCharacter" :key="key">
+                    <p class="modal-detail" v-if="value !== null && value !== undefined && key !== 'image'">
+                        <span>{{ formatKey(key) }}:</span> {{ formatValue(value) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-modal" v-if="showLoginModal" @click.self="showLoginModal = false">
+            <div class="auth-content">
+                <button class="close-btn" @click="showLoginModal = false">&times;</button>
+                <h2 class="auth-title">Вход</h2>
+                <form @submit.prevent="login">
+                    <div class="form-group">
+                        <label for="login-username">Никнейм:</label>
+                        <input type="text" id="login-username" v-model="loginData.username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Пароль:</label>
+                        <input type="password" id="login-password" v-model="loginData.password" required>
+                    </div>
+                    <p class="error-message" v-if="loginError">{{ loginError }}</p>
+                    <button type="submit" class="form-submit">Вход</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="auth-modal" v-if="showRegisterModal" @click.self="showRegisterModal = false">
+            <div class="auth-content">
+                <button class="close-btn" @click="showRegisterModal = false">&times;</button>
+                <h2 class="auth-title">Регистрация</h2>
+                <form @submit.prevent="register">
+                    <div class="form-group">
+                        <label for="reg-username">Никнейм:</label>
+                        <input type="text" id="reg-username" v-model="registerData.username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Пароль:</label>
+                        <input type="password" id="reg-password" v-model="registerData.password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-lastname">Фамилия:</label>
+                        <input type="text" id="reg-lastname" v-model="registerData.lastName" required>
+                        <p class="error-message" v-if="registerErrors.lastName">{{ registerErrors.lastName }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-firstname">Имя:</label>
+                        <input type="text" id="reg-firstname" v-model="registerData.firstName" required>
+                        <p class="error-message" v-if="registerErrors.firstName">{{ registerErrors.firstName }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-middlename">Отчество:</label>
+                        <input type="text" id="reg-middlename" v-model="registerData.middleName">
+                        <p class="error-message" v-if="registerErrors.middleName">{{ registerErrors.middleName }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-phone">Номер телефона:</label>
+                        <input type="text" id="reg-phone" v-model="registerData.phone" placeholder="8(XXX)XXX-XX-XX" required>
+                        <p class="error-message" v-if="registerErrors.phone">{{ registerErrors.phone }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-gender">Гендер:</label>
+                        <select id="reg-gender" v-model="registerData.gender" required>
+                            <option value="мужской">мужской</option>
+                            <option value="женский">женский</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-age">Возраст:</label>
+                        <input type="number" id="reg-age" v-model="registerData.age" min="10" required>
+                        <p class="error-message" v-if="registerErrors.age">{{ registerErrors.age }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Любимый факультет:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="gryffindor" value="Гриффиндор" v-model="registerData.favoriteHouses">
+                                <label for="gryffindor">Гриффиндор</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="slytherin" value="Слизерин" v-model="registerData.favoriteHouses">
+                                <label for="slytherin">Слизерин</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ravenclaw" value="Когтевран" v-model="registerData.favoriteHouses">
+                                <label for="ravenclaw">Когтевран</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="hufflepuff" value="Пуффендуй" v-model="registerData.favoriteHouses">
+                                <label for="hufflepuff">Пуффендуй</label>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="error-message" v-if="registerError">{{ registerError }}</p>
+                    <button type="submit" class="form-submit">Регистрация</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./scrtipt.js"></script>
+</body>
+</html>

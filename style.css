@@ -1,0 +1,349 @@
+:root {
+  --gryffindor-red: #740001;
+  --gryffindor-gold: #D3A625;
+  --slytherin-green: #1A472A;
+  --slytherin-silver: #5D5D5D;
+  --ravenclaw-blue: #0E1A40;
+  --ravenclaw-bronze: #946B2D;
+  --hufflepuff-yellow: #FFDB00;
+  --hufflepuff-black: #000000;
+  --hogwarts-dark: #2C2C2C;
+  --hogwarts-light: #F5F5F5;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--hogwarts-light);
+  color: var(--hogwarts-dark);
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--hogwarts-dark);
+  color: white;
+  border-radius: 4px;
+}
+
+.header h1 {
+  margin: 0;
+  color: var(--gryffindor-gold);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.auth-btn:hover {
+  opacity: 0.9;
+}
+
+.login-btn {
+  background-color: var(--ravenclaw-blue);
+  color: white;
+}
+
+.register-btn {
+  background-color: var(--slytherin-green);
+  color: white;
+}
+
+.logout-btn {
+  background-color: var(--gryffindor-red);
+  color: white;
+}
+
+.favorites-info {
+  background-color: var(--hogwarts-dark);
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.control-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--hogwarts-dark);
+}
+
+.control-group input,
+.control-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.reset-btn {
+  padding: 8px 15px;
+  background-color: var(--slytherin-silver);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-end;
+  font-size: 0.9rem;
+}
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.character-card {
+  background-color: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.character-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+.character-info {
+  padding: 12px;
+}
+
+.character-name {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: var(--hogwarts-dark);
+}
+
+.character-detail {
+  margin: 6px 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.character-detail span {
+  font-weight: bold;
+  color: var(--hogwarts-dark);
+}
+
+.favorite-btn {
+  margin-top: 10px;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: opacity 0.2s;
+}
+
+.favorite-btn:hover {
+  opacity: 0.9;
+}
+
+.add-favorite {
+  background-color: var(--hufflepuff-yellow);
+  color: var(--hufflepuff-black);
+}
+
+.remove-favorite {
+  background-color: var(--gryffindor-red);
+  color: white;
+}
+
+/* House colors */
+.gryffindor {
+  color: var(--gryffindor-red);
+  font-weight: bold;
+}
+
+.slytherin {
+  color: var(--slytherin-green);
+  font-weight: bold;
+}
+
+.ravenclaw {
+  color: var(--ravenclaw-blue);
+  font-weight: bold;
+}
+
+.hufflepuff {
+  color: var(--hufflepuff-yellow);
+  font-weight: bold;
+}
+
+/* Modals */
+.modal, .auth-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content, .auth-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 4px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #555;
+}
+
+.modal-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto 15px;
+  border: 3px solid var(--hogwarts-dark);
+}
+
+.modal-title, .auth-title {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--hogwarts-dark);
+}
+
+.modal-detail {
+  margin: 6px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.modal-detail span {
+  font-weight: bold;
+  color: var(--hogwarts-dark);
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--hogwarts-dark);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.form-submit {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--ravenclaw-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+
+.form-submit:hover {
+  opacity: 0.9;
+}
+
+.error-message {
+  color: var(--gryffindor-red);
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.checkbox-item input {
+  width: auto;
+  margin-right: 5px;
+}
